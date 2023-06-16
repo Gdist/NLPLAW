@@ -1,6 +1,8 @@
+requests
+python-dotenv
 Flask
 py2neo
 beautifulsoup4
 lxml
 selenium
-jieba
+webdriver_manager

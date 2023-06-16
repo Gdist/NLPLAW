@@ -1,30 +1,44 @@
-import re
-import os
-import json
-import requests
+import re, os, json, requests
+from dotenv import load_dotenv
+
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait 
 from bs4 import BeautifulSoup
 
 requests.packages.urllib3.disable_warnings()
+load_dotenv()
+
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-gpu')
+chrome_options.add_argument('--disable-dev-shm-usage')
+
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=chrome_options)
+
+'''print(os.getenv("SELENIUM_SERVER"))
+driver = webdriver.Remote(
+    command_executor=os.getenv("SELENIUM_SERVER"),
+    desired_capabilities=DesiredCapabilities.CHROME
+)'''
 
 if not os.path.isdir("./data"):
 	os.mkdir("./data")
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-
 def crawlJudge(target, page=10, num=100):
 	global driver
-	print(target)
 	urls = []
 
-	driver = webdriver.Chrome(options=chrome_options)
 	driver.get('https://judgment.judicial.gov.tw/FJUD/default.aspx')
 	driver.implicitly_wait(3) #隱式等待，最長等待10秒
-	element = driver.find_element(By.ID, "txtKW")    
+	element = driver.find_element(By.ID, "txtKW")
+	element.clear() # 刪掉原先已經輸入的文字
 	element.send_keys(target)
 
 	searchBtn = driver.find_element(By.ID, "btnSimpleQry")
@@ -94,7 +108,10 @@ def crawlPage(url, target):
 	return f"./data/{judId}.json"
 
 if __name__ == '__main__':
-	res = crawlJudge("公然侮辱", num=500, page=25)
+	res = crawlJudge("公然侮辱", num=1, page=1)
+	print(res)
+	print(len(res))
+	res = crawlJudge("公然侮辱", num=1, page=1)
 	print(res)
 	print(len(res))
 	#res = crawlJudge("公然侮辱", num=10, page=1)

@@ -1,9 +1,12 @@
 import os, json
+from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, escape, Response
 
 from neo4j import *
 from utils import *
 from crawler import *
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -76,4 +79,7 @@ def graph():
 	return Response(json.dumps(res), mimetype="application/json")
 
 if __name__ == '__main__':
-	app.run(host="0.0.0.0", port=11616, debug=True)
+	HOST = os.getenv("HOST")
+	PORT = os.getenv("PORT")
+	DEBUG = (os.getenv('DEBUG', 'False') == 'True')
+	app.run(host=HOST, port=PORT, debug=DEBUG)

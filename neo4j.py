@@ -13,7 +13,7 @@ db_server = os.getenv("NEO4J_SERVER")
 db_name = os.getenv("NEO4J_NAME")
 db_user, db_pass = os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASS")
 
-graph = Graph(os.getenv("NEO4J_SERVER"), name='neo4j', auth=('neo4j', 'adminadmin'))
+graph = Graph(db_server, name=db_name, auth=(db_user, db_pass))
 
 def genKey():
 	seed = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -193,11 +193,14 @@ def getgraph(title="臺灣高等法院 臺中分院刑事103,上易,480"):
 if __name__ == '__main__':
 	#MATCH (n:裁判書) WHERE n.name = 'TEST' RETURN n
 	#MATCH (n:裁判書) WHERE n.name = 'TEST' detach delete n
+
+	with open(f"./data/臺灣臺南地方法院 112 年度訴字第 345 號刑事判決.json", 'r', encoding='utf-8') as f:
+		judge = json.load(f)
+	data = extract(judge["裁判字號"], judge["主文"], judge['相關法條'])
+	with open(f"./result/{judge['裁判字號']}.json", "w", encoding='utf-8') as f:
+		json.dump(data, f, indent=4, ensure_ascii=False)
+
+	exit()
 	test = "臺灣屏東地方法院 112 年度易字第 260 號刑事判決"
 	print(getRelatedNode(test))
 	print(getgraph(test))
-	'''with open('./output/臺灣嘉義地方法院 112 年度附民字第 206 號刑事裁定.json', 'r', encoding='utf-8') as f:
-		judge = json.load(f)
-	data = extract(judge["裁判字號"], judge["主文"], judge['相關法條'])
-	print(json.dumps(data, ensure_ascii=False, indent=4))'''
-	#commit(data)
